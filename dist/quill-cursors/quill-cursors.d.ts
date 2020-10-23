@@ -12,7 +12,7 @@ export default class QuillCursors {
     createCursor(id: string, name: string, color: string): Cursor;
     moveCursor(id: string, range: IQuillRange, scale?: number): void;
     removeCursor(id: string): void;
-    update(): void;
+    update(scale?: number): void;
     clearCursors(): void;
     toggleFlag(id: string, shouldShow?: boolean): void;
     cursors(): Cursor[];

@@ -59,8 +59,8 @@ export default class QuillCursors {
     delete this._cursors[id];
   }
 
-  public update(): void {
-    this.cursors().forEach((cursor: Cursor) => this._updateCursor(cursor));
+  public update(scale?: number): void {
+    this.cursors().forEach((cursor: Cursor) => this._updateCursor(cursor, scale));
   }
 
   public clearCursors(): void {
