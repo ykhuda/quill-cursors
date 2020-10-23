@@ -85,28 +85,28 @@ export default class Cursor {
     setTimeout(() => this._flagEl.classList.remove(Cursor.NO_DELAY_CLASS), this._hideSpeedMs);
   }
 
-  public updateCaret(rectangle: ClientRect, container: ClientRect): void {
-    this._caretEl.style.top = `${rectangle.top}px`;
-    this._caretEl.style.left = `${rectangle.left}px`;
-    this._caretEl.style.height = `${rectangle.height}px`;
+  public updateCaret(rectangle: ClientRect, container: ClientRect, scale?: number): void {
+    this._caretEl.style.top = `${this._scaledValue(rectangle.top, scale)}px`;
+    this._caretEl.style.left = `${this._scaledValue(rectangle.top, scale)}px`;
+    this._caretEl.style.height = `${this._scaledValue(rectangle.top, scale)}px`;
 
     if (this._positionFlag) {
       this._positionFlag(this._flagEl, rectangle, container);
     } else {
-      this._updateCaretFlag(rectangle, container);
+      this._updateCaretFlag(rectangle, container, scale);
     }
   }
 
-  public updateSelection(selections: ClientRect[], container: ClientRect): void {
+  public updateSelection(selections: ClientRect[], container: ClientRect, scale?: number): void {
     this._clearSelection();
     selections = selections || [];
     selections = Array.from(selections);
     selections = this._sanitize(selections);
     selections = this._sortByDomPosition(selections);
-    selections.forEach((selection: ClientRect) => this._addSelection(selection, container));
+    selections.forEach((selection: ClientRect) => this._addSelection(selection, container, scale));
   }
 
-  private _updateCaretFlag(caretRectangle: ClientRect, container: ClientRect): void {
+  private _updateCaretFlag(caretRectangle: ClientRect, container: ClientRect, scale?: number): void {
     this._flagEl.style.width = '';
     const flagRect = this._flagEl.getBoundingClientRect();
 
@@ -114,29 +114,29 @@ export default class Cursor {
     if (caretRectangle.left > container.width - flagRect.width) {
       this._flagEl.classList.add(Cursor.FLAG_FLIPPED_CLASS);
     }
-    this._flagEl.style.left = `${caretRectangle.left}px`;
-    this._flagEl.style.top = `${caretRectangle.top}px`;
+    this._flagEl.style.left = `${this._scaledValue(caretRectangle.left, scale)}px`;
+    this._flagEl.style.top = `${this._scaledValue(caretRectangle.top, scale)}px`;
     // Chrome has an issue when doing translate3D with non integer width, this ceil is to overcome it.
-    this._flagEl.style.width = `${Math.ceil(flagRect.width)}px`;
+    this._flagEl.style.width = `${this._scaledValue(Math.ceil(flagRect.width), scale)}px`;
   }
 
   private _clearSelection(): void {
     this._selectionEl.innerHTML = '';
   }
 
-  private _addSelection(selection: ClientRect, container: ClientRect): void {
-    const selectionBlock = this._selectionBlock(selection, container);
+  private _addSelection(selection: ClientRect, container: ClientRect, scale?: number): void {
+    const selectionBlock = this._selectionBlock(selection, container, scale);
     this._selectionEl.appendChild(selectionBlock);
   }
 
-  private _selectionBlock(selection: ClientRect, container: ClientRect): HTMLElement {
+  private _selectionBlock(selection: ClientRect, container: ClientRect, scale?: number): HTMLElement {
     const element = document.createElement(Cursor.SELECTION_ELEMENT_TAG);
 
     element.classList.add(Cursor.SELECTION_BLOCK_CLASS);
-    element.style.top = `${selection.top - container.top}px`;
-    element.style.left = `${selection.left - container.left}px`;
-    element.style.width = `${selection.width}px`;
-    element.style.height = `${selection.height}px`;
+    element.style.top = `${this._scaledValue(selection.top - container.top, scale)}px`;
+    element.style.left = `${this._scaledValue(selection.left - container.left, scale)}px`;
+    element.style.width = `${this._scaledValue(selection.width, scale)}px`;
+    element.style.height = `${this._scaledValue(selection.height, scale)}px`;
     element.style.backgroundColor = tinycolor(this.color).setAlpha(0.3).toString();
 
     return element;
@@ -150,6 +150,16 @@ export default class Cursor {
 
       return a.top - b.top;
     });
+  }
+
+  private _scaledValue(value: number, scale: number) {
+    if (scale) {
+      if (scale >= 1) {
+        return value * scale;
+      } else if (scale < 1 && scale > 0) {
+        return value / scale;
+      }
+    } else return value;
   }
 
   private _sanitize(selections: ClientRect[]): ClientRect[] {

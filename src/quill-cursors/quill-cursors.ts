@@ -39,14 +39,14 @@ export default class QuillCursors {
     return cursor;
   }
 
-  public moveCursor(id: string, range: IQuillRange): void {
+  public moveCursor(id: string, range: IQuillRange, scale?: number): void {
     const cursor = this._cursors[id];
     if (!cursor) {
       return;
     }
 
     cursor.range = range;
-    this._updateCursor(cursor);
+    this._updateCursor(cursor, scale);
   }
 
   public removeCursor(id: string): void {
@@ -104,7 +104,7 @@ export default class QuillCursors {
     resizeObserver.observe(editor);
   }
 
-  private _updateCursor(cursor: Cursor): void {
+  private _updateCursor(cursor: Cursor, scale?: number): void {
     if (!cursor.range) {
       return cursor.hide();
     }
@@ -124,13 +124,13 @@ export default class QuillCursors {
     const containerRectangle = this._boundsContainer.getBoundingClientRect();
 
     const endBounds = this._quill.getBounds(endIndex);
-    cursor.updateCaret(endBounds, containerRectangle);
+    cursor.updateCaret(endBounds, containerRectangle, scale);
 
     const ranges = this._lineRanges(cursor, startLeaf, endLeaf);
     const selectionRectangles = ranges
       .reduce((rectangles, range) => rectangles.concat(Array.from(RangeFix.getClientRects(range))), []);
 
-    cursor.updateSelection(selectionRectangles, containerRectangle);
+    cursor.updateSelection(selectionRectangles, containerRectangle, scale);
   }
 
   private _indexWithinQuillBounds(index: number): number {
