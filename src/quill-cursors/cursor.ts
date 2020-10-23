@@ -87,8 +87,8 @@ export default class Cursor {
 
   public updateCaret(rectangle: ClientRect, container: ClientRect, scale?: number): void {
     this._caretEl.style.top = `${this._scaledValue(rectangle.top, scale)}px`;
-    this._caretEl.style.left = `${this._scaledValue(rectangle.top, scale)}px`;
-    this._caretEl.style.height = `${this._scaledValue(rectangle.top, scale)}px`;
+    this._caretEl.style.left = `${this._scaledValue(rectangle.left, scale)}px`;
+    this._caretEl.style.height = `${this._scaledValue(rectangle.height, scale)}px`;
 
     if (this._positionFlag) {
       this._positionFlag(this._flagEl, rectangle, container);

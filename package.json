@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/reedsy/quill-cursors.git"
+    "url": "git+https://github.com/ykhuda/quill-cursors.git"
   },
   "devDependencies": {
     "@reedsy/eslint-config-reedsy": "github:reedsy/eslint-config-reedsy#2.0.0",
